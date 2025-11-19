@@ -1,0 +1,30 @@
+services:
+  mobsf:
+    image: opensecurity/mobile-security-framework-mobsf:latest
+    container_name: mobsf
+    ports:
+      - "8000:8000"
+    environment:
+      - MOBSF_API_KEY=${MOBSF_API_KEY}
+    volumes:
+      - mobsf_data:/root/.MobSF
+    restart: unless-stopped
+
+  myapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: myapp
+    ports:
+      - "5000:5000"
+    environment:
+      # aplikasi bisa membaca url mobsf dg nama service "mobsf"
+      - MOBSF_URL=http://mobsf:8000
+      - MOBSF_API_KEY=${MOBSF_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    depends_on:
+      - mobsf
+    restart: unless-stopped
+
+volumes:
+  mobsf_data:
